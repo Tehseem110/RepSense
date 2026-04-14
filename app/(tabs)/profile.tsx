@@ -49,13 +49,12 @@ interface EditGoalModalProps {
   title: string;
   subtitle: string;
   unit: string;
-  whoTarget: number;
   currentGoal: number;
   onClose: () => void;
   onSave: (val: number) => void;
 }
 function EditGoalModal({
-  visible, title, subtitle, unit, whoTarget, currentGoal, onClose, onSave,
+  visible, title, subtitle, unit, currentGoal, onClose, onSave,
 }: EditGoalModalProps) {
   const [input, setInput] = useState(String(currentGoal));
 
@@ -69,8 +68,6 @@ function EditGoalModal({
     onClose();
   };
 
-  const applyWHO = () => setInput(String(whoTarget));
-
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -82,14 +79,6 @@ function EditGoalModal({
 
           <Text style={modal.title}>Edit {title}</Text>
           <Text style={modal.subtitle}>{subtitle}</Text>
-
-          {/* WHO suggestion chip */}
-          <TouchableOpacity style={modal.whoChip} onPress={applyWHO} activeOpacity={0.8}>
-            <Ionicons name="medical-outline" size={14} color="#73e5a5" />
-            <Text style={modal.whoChipText}>
-              Use WHO target: {whoTarget} {unit}
-            </Text>
-          </TouchableOpacity>
 
           {/* Input */}
           <View style={modal.inputRow}>
@@ -133,13 +122,6 @@ const modal = StyleSheet.create({
   },
   title: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 4 },
   subtitle: { color: '#768490', fontSize: 13, marginBottom: 16 },
-  whoChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#73e5a515', borderWidth: 1, borderColor: '#73e5a530',
-    borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
-    marginBottom: 18, alignSelf: 'flex-start',
-  },
-  whoChipText: { color: '#73e5a5', fontSize: 13, fontWeight: '600' },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 },
   input: {
     flex: 1, backgroundColor: '#0c1316', borderRadius: 14,
@@ -224,13 +206,12 @@ const pillS = StyleSheet.create({
 });
 
 // ─── Editable Goal Row ────────────────────────────────────────────────────────
-function GoalRow({ icon, color, label, value, goal, unit, note, whoTarget, onEdit }: {
+function GoalRow({ icon, color, label, value, goal, unit, note, onEdit }: {
   icon: keyof typeof Ionicons.glyphMap; color: string; label: string;
   value: number; goal: number; unit: string; note: string;
-  whoTarget: number; onEdit: () => void;
+  onEdit: () => void;
 }) {
   const pct = Math.min(value / goal, 1);
-  const isWHO = goal === whoTarget;
 
   return (
     <View style={goalS.card}>
@@ -262,12 +243,6 @@ function GoalRow({ icon, color, label, value, goal, unit, note, whoTarget, onEdi
         <View style={goalS.pctBadge}>
           <Text style={[goalS.pctText, { color }]}>{Math.round(pct * 100)}%</Text>
         </View>
-        {isWHO && (
-          <View style={goalS.whoBadge}>
-            <Ionicons name="checkmark-circle" size={12} color="#73e5a5" />
-            <Text style={goalS.whoText}>WHO</Text>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -291,13 +266,6 @@ const goalS = StyleSheet.create({
   progressGoal: { color: '#768490', fontWeight: '500' },
   pctBadge: { backgroundColor: '#1b3237', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   pctText: { fontSize: 12, fontWeight: '700' },
-  whoBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#73e5a515', borderRadius: 8,
-    paddingHorizontal: 8, paddingVertical: 3,
-    borderWidth: 1, borderColor: '#73e5a530',
-  },
-  whoText: { color: '#73e5a5', fontSize: 11, fontWeight: '700' },
 });
 
 // ─── Zone Ladder ─────────────────────────────────────────────────────────────
@@ -403,7 +371,7 @@ export default function ProfileScreen() {
               <Text style={[s.scoreZoneLabel, { color: zone.color }]}>{zone.label}</Text>
               <Text style={s.scoreDesc}>{zone.description}</Text>
               <View style={s.benchBox}>
-                <Text style={s.benchTitle}>WHO TARGETS (score basis)</Text>
+                <Text style={s.benchTitle}>TARGETS (score basis)</Text>
                 <View style={s.benchRow}>
                   <Ionicons name="flame" size={13} color="#ff9f43" />
                   <Text style={s.benchText}>{WHO_CAL_TARGET} kcal/day</Text>
@@ -417,16 +385,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* ── Today's Stats ── */}
-        <Text style={s.sectionLabel}>TODAY'S ACTIVITY</Text>
-        <View style={s.pillRow}>
-          <StatPill icon="flame" color="#ff9f43" label="Calories Burned"
-            value={`${calories} kcal`} sub={`Goal: ${calorieGoal} kcal`} />
-          <View style={{ width: 12 }} />
-          <StatPill icon="timer-outline" color="#6ae094" label="Active Time"
-            value={formatTime(activeTimeSeconds)} sub={`Goal: ${timeGoalMins} min`} />
-        </View>
-
         {/* ── Editable Goals ── */}
         <Text style={s.sectionLabel}>MY DAILY GOALS</Text>
 
@@ -434,15 +392,13 @@ export default function ProfileScreen() {
           icon="flame" color="#ff9f43" label="Calorie Goal"
           value={calories} goal={calorieGoal} unit="kcal"
           note="ACSM recommendation: 300–500 kcal/day"
-          whoTarget={WHO_CAL_TARGET}
           onEdit={() => setEditCal(true)}
         />
 
         <GoalRow
           icon="timer-outline" color="#6ae094" label="Active Time Goal"
           value={Math.round(activeTimeSeconds / 60)} goal={timeGoalMins} unit="min"
-          note="WHO recommendation: 30 min minimum, 45 min excellent"
-          whoTarget={45}
+          note="Recommendation: 30 min minimum, 45 min excellent"
           onEdit={() => setEditTime(true)}
         />
 
@@ -458,7 +414,6 @@ export default function ProfileScreen() {
         title="Calorie Goal"
         subtitle="Set your daily calorie burn target"
         unit="kcal"
-        whoTarget={WHO_CAL_TARGET}
         currentGoal={calorieGoal}
         onClose={() => setEditCal(false)}
         onSave={setCalorieGoal}
@@ -468,7 +423,6 @@ export default function ProfileScreen() {
         title="Active Time Goal"
         subtitle="Set your daily active time target"
         unit="min"
-        whoTarget={45}
         currentGoal={timeGoalMins}
         onClose={() => setEditTime(false)}
         onSave={(mins) => setActiveTimeGoalSeconds(mins * 60)}

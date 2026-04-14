@@ -6,7 +6,7 @@ import {
   WHO_CAL_TARGET,
   WHO_TIME_TARGET,
   getRepSenseScore,
-  getZoneForScore,
+  getZoneForScore, 
 } from '@/constants/health';
 
 const ZONE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
