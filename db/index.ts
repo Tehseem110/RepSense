@@ -14,6 +14,12 @@ export interface WeightLog {
   date: string; // ISO date string YYYY-MM-DD
 }
 
+export interface DailyStats {
+  date: string;            // ISO date YYYY-MM-DD (PRIMARY KEY)
+  calories: number;        // kcal burned
+  active_time_seconds: number; // active time in seconds
+}
+
 let db: SQLite.SQLiteDatabase | null = null;
 
 // Initialize and get the database connection
@@ -40,6 +46,11 @@ export const initDb = async () => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       weight_kg REAL NOT NULL,
       date TEXT NOT NULL UNIQUE
+    );
+    CREATE TABLE IF NOT EXISTS daily_stats (
+      date TEXT PRIMARY KEY,
+      calories INTEGER NOT NULL DEFAULT 0,
+      active_time_seconds INTEGER NOT NULL DEFAULT 0
     );
   `);
 };
@@ -72,6 +83,44 @@ export const getActivityHistory = async (): Promise<ActivityLog[]> => {
     'SELECT * FROM activity_logs ORDER BY date DESC'
   );
   return allRows;
+};
+
+// --- Daily Stats helpers (calories + active time per date) ---
+
+// Upsert (insert or replace) stats for a given date
+export const upsertDailyStats = async (stats: DailyStats) => {
+  const database = await getDb();
+  const statement = await database.prepareAsync(
+    'INSERT OR REPLACE INTO daily_stats (date, calories, active_time_seconds) VALUES ($date, $calories, $active_time_seconds)'
+  );
+  try {
+    await statement.executeAsync({
+      $date: stats.date,
+      $calories: stats.calories,
+      $active_time_seconds: stats.active_time_seconds,
+    });
+  } finally {
+    await statement.finalizeAsync();
+  }
+};
+
+// Get stats for a specific date (returns null if no record exists)
+export const getDailyStatsByDate = async (date: string): Promise<DailyStats | null> => {
+  const database = await getDb();
+  const row = await database.getFirstAsync<DailyStats>(
+    'SELECT * FROM daily_stats WHERE date = $date',
+    { $date: date }
+  );
+  return row ?? null;
+};
+
+// Get all daily stats ordered newest first
+export const getAllDailyStats = async (): Promise<DailyStats[]> => {
+  const database = await getDb();
+  const rows = await database.getAllAsync<DailyStats>(
+    'SELECT * FROM daily_stats ORDER BY date DESC'
+  );
+  return rows;
 };
 
 // --- Weight Log helpers ---

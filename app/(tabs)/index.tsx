@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HomeHeader from "@/components/home/HomeHeader";
@@ -7,8 +7,11 @@ import HomeTopTiles from "@/components/home/HomeTopTiles";
 import HomeActivityMeter from "@/components/home/HomeActivityMeter";
 import HomeHistory from "@/components/home/HomeHistory";
 import HomeWeightCard from "@/components/home/HomeWeightCard";
+import WorkoutTrackerModal from "@/components/home/WorkoutTrackerModal";
 
 export default function HomeScreen() {
+  const [workoutOpen, setWorkoutOpen] = useState(false);
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -17,13 +20,22 @@ export default function HomeScreen() {
         <HomeTopTiles />
         <HomeActivityMeter />
 
-        {/* Start Button */}
-        <TouchableOpacity style={styles.startButton} activeOpacity={0.8}>
+        {/* Start Workout Button */}
+        <TouchableOpacity
+          style={styles.startButton}
+          activeOpacity={0.8}
+          onPress={() => setWorkoutOpen(true)}
+        >
           <Text style={styles.startButtonText}>Start Workout</Text>
         </TouchableOpacity>
 
-        <HomeWeightCard />
+        {/* Workout Tracker Modal */}
+        <WorkoutTrackerModal
+          visible={workoutOpen}
+          onClose={() => setWorkoutOpen(false)}
+        />
 
+        <HomeWeightCard />
         <HomeHistory />
       </ScrollView>
     </SafeAreaView>
