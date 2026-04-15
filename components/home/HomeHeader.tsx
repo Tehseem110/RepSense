@@ -1,8 +1,11 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import Logo from "@/assets/images/icon.png";
 
 export default function HomeHeader() {
+  const router = useRouter();
+
   return (
     <View style={styles.header}>
       <View style={styles.logoContainer}>
@@ -10,10 +13,12 @@ export default function HomeHeader() {
         <Text style={styles.logoText}>RepSense</Text>
       </View>
       <View style={styles.headerRight}>
-        <Image
-          source={require("@/assets/images/dummyProfile.png")}
-          style={styles.avatar}
-        />
+        <TouchableOpacity activeOpacity={0.8} onPress={() => router.push('/profile')}>
+          <Image
+            source={require("@/assets/images/dummyProfile.png")}
+            style={styles.avatar}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );

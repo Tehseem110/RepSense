@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,30 +8,30 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useUserStore } from '@/store/useStore';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useUserStore } from "@/store/useStore";
 import {
   upsertDailyStats,
   getDailyStatsByDate,
   getAllDailyStats,
   DailyStats,
-} from '@/db';
+} from "@/db";
 
 // ─── Helper ────────────────────────────────────────────────────────────────
 function formatTime(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
   const s = totalSeconds % 60;
-  return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
+  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
 }
 
 function toDateString(d: Date): string {
   // Returns YYYY-MM-DD in local time (not UTC)
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
@@ -73,13 +73,15 @@ function TestRow({
   onIncrement,
   onDecrement,
   onReset,
-  incrementLabel = '+10',
+  incrementLabel = "+10",
 }: TestRowProps) {
   return (
     <View style={rowStyles.card}>
       {/* Header */}
       <View style={rowStyles.header}>
-        <View style={[rowStyles.iconBadge, { backgroundColor: iconColor + '22' }]}>
+        <View
+          style={[rowStyles.iconBadge, { backgroundColor: iconColor + "22" }]}
+        >
           <Ionicons name={icon} size={22} color={iconColor} />
         </View>
         <Text style={rowStyles.label}>{label}</Text>
@@ -97,20 +99,36 @@ function TestRow({
           keyboardType="numeric"
         />
         <Text style={rowStyles.unitLabel}>{unit}</Text>
-        <TouchableOpacity style={rowStyles.setBtn} onPress={onSet} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={rowStyles.setBtn}
+          onPress={onSet}
+          activeOpacity={0.8}
+        >
           <Text style={rowStyles.setBtnText}>Set</Text>
         </TouchableOpacity>
       </View>
 
       {/* Quick buttons */}
       <View style={rowStyles.quickRow}>
-        <TouchableOpacity style={[rowStyles.quickBtn, rowStyles.decrementBtn]} onPress={onDecrement} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={[rowStyles.quickBtn, rowStyles.decrementBtn]}
+          onPress={onDecrement}
+          activeOpacity={0.8}
+        >
           <Ionicons name="remove" size={18} color="#ff6b6b" />
         </TouchableOpacity>
-        <TouchableOpacity style={[rowStyles.quickBtn, rowStyles.incrementBtn]} onPress={onIncrement} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={[rowStyles.quickBtn, rowStyles.incrementBtn]}
+          onPress={onIncrement}
+          activeOpacity={0.8}
+        >
           <Text style={rowStyles.quickBtnText}>{incrementLabel}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[rowStyles.quickBtn, rowStyles.resetBtn]} onPress={onReset} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={[rowStyles.quickBtn, rowStyles.resetBtn]}
+          onPress={onReset}
+          activeOpacity={0.8}
+        >
           <Ionicons name="refresh" size={16} color="#768490" />
           <Text style={rowStyles.resetText}>Reset</Text>
         </TouchableOpacity>
@@ -125,7 +143,11 @@ function HistoryRow({ stat, isToday }: { stat: DailyStats; isToday: boolean }) {
     <View style={[histStyles.row, isToday && histStyles.rowToday]}>
       <View style={histStyles.dateCol}>
         <Text style={histStyles.dateText}>{stat.date}</Text>
-        {isToday && <View style={histStyles.todayBadge}><Text style={histStyles.todayBadgeText}>TODAY</Text></View>}
+        {isToday && (
+          <View style={histStyles.todayBadge}>
+            <Text style={histStyles.todayBadgeText}>TODAY</Text>
+          </View>
+        )}
       </View>
       <View style={histStyles.valCol}>
         <Ionicons name="flame" size={14} color="#ff9f43" />
@@ -133,7 +155,9 @@ function HistoryRow({ stat, isToday }: { stat: DailyStats; isToday: boolean }) {
       </View>
       <View style={histStyles.valCol}>
         <Ionicons name="timer-outline" size={14} color="#6ae094" />
-        <Text style={histStyles.valText}>{formatTime(stat.active_time_seconds)}</Text>
+        <Text style={histStyles.valText}>
+          {formatTime(stat.active_time_seconds)}
+        </Text>
       </View>
     </View>
   );
@@ -159,8 +183,8 @@ export default function TestPanel() {
   const [loading, setLoading] = useState(false);
 
   // ── Input fields ──
-  const [calInput, setCalInput] = useState('');
-  const [timeInput, setTimeInput] = useState('');
+  const [calInput, setCalInput] = useState("");
+  const [timeInput, setTimeInput] = useState("");
 
   // ── History list ──
   const [history, setHistory] = useState<DailyStats[]>([]);
@@ -179,10 +203,10 @@ export default function TestPanel() {
         setCalories(0);
         setActiveTimeSeconds(0);
       }
-      setCalInput('');
-      setTimeInput('');
+      setCalInput("");
+      setTimeInput("");
     } catch (e) {
-      console.error('loadDate error', e);
+      console.error("loadDate error", e);
     } finally {
       setLoading(false);
     }
@@ -211,12 +235,12 @@ export default function TestPanel() {
   const handleSetCalories = async () => {
     const val = parseInt(calInput, 10);
     if (isNaN(val) || val < 0) {
-      Alert.alert('Invalid', 'Enter a valid non-negative number.');
+      Alert.alert("Invalid", "Enter a valid non-negative number.");
       return;
     }
     const next = val;
     setCalories(next);
-    setCalInput('');
+    setCalInput("");
     await persist(next, activeTimeSeconds);
   };
 
@@ -224,12 +248,12 @@ export default function TestPanel() {
   const handleSetTime = async () => {
     const val = parseInt(timeInput, 10);
     if (isNaN(val) || val < 0) {
-      Alert.alert('Invalid', 'Enter a valid number of minutes.');
+      Alert.alert("Invalid", "Enter a valid number of minutes.");
       return;
     }
     const next = val * 60;
     setActiveTimeSeconds(next);
-    setTimeInput('');
+    setTimeInput("");
     await persist(calories, next);
   };
 
@@ -265,15 +289,17 @@ export default function TestPanel() {
   const handleResetAll = async () => {
     setCalories(0);
     setActiveTimeSeconds(0);
-    setCalInput('');
-    setTimeInput('');
+    setCalInput("");
+    setTimeInput("");
     await persist(0, 0);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* ── Title ── */}
         <View style={styles.titleRow}>
           <View style={styles.titleBadge}>
@@ -281,19 +307,30 @@ export default function TestPanel() {
           </View>
           <View>
             <Text style={styles.title}>Dev Test Panel</Text>
-            <Text style={styles.subtitle}>Changes reflect live on Home screen</Text>
+            <Text style={styles.subtitle}>
+              Changes reflect live on Home screen
+            </Text>
           </View>
         </View>
 
         {/* ── Date Navigator ── */}
         <View style={styles.dateNavCard}>
-          <TouchableOpacity style={styles.navBtn} onPress={() => shiftDate(-1)} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.navBtn}
+            onPress={() => shiftDate(-1)}
+            activeOpacity={0.7}
+          >
             <Ionicons name="chevron-back" size={22} color="#73e5a5" />
           </TouchableOpacity>
           <View style={styles.dateCenterBlock}>
-            <Text style={styles.dateLabel}>{formatDisplayDate(selectedDateStr)}</Text>
+            <Text style={styles.dateLabel}>
+              {formatDisplayDate(selectedDateStr)}
+            </Text>
             {!isToday && (
-              <TouchableOpacity onPress={() => setSelectedDate(new Date())} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={() => setSelectedDate(new Date())}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.jumpToday}>Jump to Today</Text>
               </TouchableOpacity>
             )}
@@ -304,7 +341,11 @@ export default function TestPanel() {
             disabled={isToday}
             activeOpacity={0.7}
           >
-            <Ionicons name="chevron-forward" size={22} color={isToday ? '#2a3d47' : '#73e5a5'} />
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={isToday ? "#2a3d47" : "#73e5a5"}
+            />
           </TouchableOpacity>
         </View>
 
@@ -316,7 +357,9 @@ export default function TestPanel() {
             <View style={styles.snapshotCard}>
               <View style={styles.snapshotTitleRow}>
                 <Text style={styles.snapshotTitle}>
-                  {isToday ? 'Current Values (Home Screen)' : `Values for ${selectedDateStr}`}
+                  {isToday
+                    ? "Current Values (Home Screen)"
+                    : `Values for ${selectedDateStr}`}
                 </Text>
                 {!isToday && (
                   <View style={styles.historyBadge}>
@@ -334,14 +377,18 @@ export default function TestPanel() {
                 <View style={styles.snapshotDivider} />
                 <View style={styles.snapshotItem}>
                   <Ionicons name="timer-outline" size={24} color="#6ae094" />
-                  <Text style={styles.snapshotVal}>{formatTime(activeTimeSeconds)}</Text>
+                  <Text style={styles.snapshotVal}>
+                    {formatTime(activeTimeSeconds)}
+                  </Text>
                   <Text style={styles.snapshotUnit}>hh:mm:ss</Text>
                 </View>
               </View>
               {isToday && (
                 <View style={styles.mmkvNote}>
                   <Ionicons name="save-outline" size={12} color="#73e5a5" />
-                  <Text style={styles.mmkvNoteText}>Also synced to MMKV → Home screen updates live</Text>
+                  <Text style={styles.mmkvNoteText}>
+                    Also synced to MMKV → Home screen updates live
+                  </Text>
                 </View>
               )}
             </View>
@@ -375,7 +422,9 @@ export default function TestPanel() {
               onChangeText={setTimeInput}
               onSet={handleSetTime}
               onIncrement={() => updateActiveTime(activeTimeSeconds + 300)}
-              onDecrement={() => updateActiveTime(Math.max(0, activeTimeSeconds - 300))}
+              onDecrement={() =>
+                updateActiveTime(Math.max(0, activeTimeSeconds - 300))
+              }
               onReset={() => updateActiveTime(0)}
               incrementLabel="+5 min"
             />
@@ -387,11 +436,14 @@ export default function TestPanel() {
               activeOpacity={0.8}
             >
               <Ionicons name="trash-outline" size={18} color="#ff6b6b" />
-              <Text style={styles.resetAllText}>Reset {isToday ? "Today's" : `${selectedDateStr}'s`} Values</Text>
+              <Text style={styles.resetAllText}>
+                Reset {isToday ? "Today's" : `${selectedDateStr}'s`} Values
+              </Text>
             </TouchableOpacity>
 
             <Text style={styles.hint}>
-              ℹ️  Values saved to SQLite per date. Today's values also sync to MMKV.{'\n'}
+              ℹ️ Values saved to SQLite per date. Today's values also sync to
+              MMKV.{"\n"}
               Navigate dates with ‹ › to view or edit past records.
             </Text>
           </>
@@ -403,9 +455,13 @@ export default function TestPanel() {
           onPress={showHistory ? () => setShowHistory(false) : loadHistory}
           activeOpacity={0.8}
         >
-          <Ionicons name={showHistory ? 'chevron-up' : 'list-outline'} size={18} color="#73e5a5" />
+          <Ionicons
+            name={showHistory ? "chevron-up" : "list-outline"}
+            size={18}
+            color="#73e5a5"
+          />
           <Text style={styles.historyToggleText}>
-            {showHistory ? 'Hide History' : 'View All History'}
+            {showHistory ? "Hide History" : "View All History"}
           </Text>
         </TouchableOpacity>
 
@@ -413,20 +469,28 @@ export default function TestPanel() {
           <View style={styles.historyCard}>
             <Text style={styles.historyTitle}>All Daily Records</Text>
             {history.length === 0 ? (
-              <Text style={styles.emptyText}>No records yet. Set some values above!</Text>
+              <Text style={styles.emptyText}>
+                No records yet. Set some values above!
+              </Text>
             ) : (
               <>
                 {/* Header row */}
                 <View style={histStyles.headerRow}>
-                  <Text style={[histStyles.headerText, { flex: 1.2 }]}>Date</Text>
-                  <Text style={[histStyles.headerText, { flex: 1 }]}>Calories</Text>
-                  <Text style={[histStyles.headerText, { flex: 1 }]}>Active Time</Text>
+                  <Text style={[histStyles.headerText, { flex: 1.2 }]}>
+                    Date
+                  </Text>
+                  <Text style={[histStyles.headerText, { flex: 1 }]}>
+                    Calories
+                  </Text>
+                  <Text style={[histStyles.headerText, { flex: 1 }]}>
+                    Active Time
+                  </Text>
                 </View>
                 {history.map((stat) => (
                   <TouchableOpacity
                     key={stat.date}
                     onPress={() => {
-                      setSelectedDate(new Date(stat.date + 'T12:00:00'));
+                      setSelectedDate(new Date(stat.date + "T12:00:00"));
                       setShowHistory(false);
                     }}
                     activeOpacity={0.7}
@@ -434,12 +498,13 @@ export default function TestPanel() {
                     <HistoryRow stat={stat} isToday={stat.date === todayStr} />
                   </TouchableOpacity>
                 ))}
-                <Text style={styles.historyHint}>Tap a row to jump to that date</Text>
+                <Text style={styles.historyHint}>
+                  Tap a row to jump to that date
+                </Text>
               </>
             )}
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -448,168 +513,168 @@ export default function TestPanel() {
 // ─── History Styles ───────────────────────────────────────────────────────────
 const histStyles = StyleSheet.create({
   headerRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#2a3d47',
+    borderBottomColor: "#2a3d47",
     marginBottom: 4,
   },
   headerText: {
-    color: '#768490',
+    color: "#768490",
     fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#18242a',
+    borderBottomColor: "#18242a",
   },
   rowToday: {
-    backgroundColor: '#73e5a511',
+    backgroundColor: "#73e5a511",
     borderRadius: 8,
     paddingHorizontal: 6,
     marginHorizontal: -6,
   },
   dateCol: {
     flex: 1.2,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   dateText: {
-    color: '#c0cdd5',
+    color: "#c0cdd5",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   todayBadge: {
-    backgroundColor: '#73e5a522',
+    backgroundColor: "#73e5a522",
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 2,
   },
   todayBadgeText: {
-    color: '#73e5a5',
+    color: "#73e5a5",
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   valCol: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
   },
   valText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 
 // ─── Row Styles ──────────────────────────────────────────────────────────────
 const rowStyles = StyleSheet.create({
   card: {
-    backgroundColor: '#18242a',
+    backgroundColor: "#18242a",
     borderRadius: 18,
     padding: 18,
     marginBottom: 16,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 14,
   },
   iconBadge: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   label: {
     flex: 1,
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   currentValue: {
-    color: '#73e5a5',
+    color: "#73e5a5",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   input: {
     flex: 1,
-    backgroundColor: '#0e1c22',
+    backgroundColor: "#0e1c22",
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#2a3d47',
+    borderColor: "#2a3d47",
   },
   unitLabel: {
-    color: '#768490',
+    color: "#768490",
     marginHorizontal: 10,
     fontSize: 14,
     width: 30,
   },
   setBtn: {
-    backgroundColor: '#73e5a5',
+    backgroundColor: "#73e5a5",
     borderRadius: 10,
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
   setBtnText: {
-    color: '#0c1316',
-    fontWeight: '800',
+    color: "#0c1316",
+    fontWeight: "800",
     fontSize: 15,
   },
   quickRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   quickBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 14,
     gap: 4,
   },
   decrementBtn: {
-    backgroundColor: '#ff6b6b22',
+    backgroundColor: "#ff6b6b22",
     borderWidth: 1,
-    borderColor: '#ff6b6b44',
+    borderColor: "#ff6b6b44",
   },
   incrementBtn: {
     flex: 1,
-    backgroundColor: '#73e5a522',
+    backgroundColor: "#73e5a522",
     borderWidth: 1,
-    borderColor: '#73e5a544',
-    justifyContent: 'center',
+    borderColor: "#73e5a544",
+    justifyContent: "center",
   },
   quickBtnText: {
-    color: '#73e5a5',
-    fontWeight: '700',
+    color: "#73e5a5",
+    fontWeight: "700",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   resetBtn: {
-    backgroundColor: '#2a3d47',
+    backgroundColor: "#2a3d47",
   },
   resetText: {
-    color: '#768490',
+    color: "#768490",
     fontSize: 13,
   },
 });
@@ -618,15 +683,15 @@ const rowStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0c1316',
+    backgroundColor: "#0c1316",
   },
   scroll: {
     padding: 20,
     paddingBottom: 40,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 14,
     marginBottom: 20,
   },
@@ -634,205 +699,205 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: '#73e5a522',
+    backgroundColor: "#73e5a522",
     borderWidth: 1,
-    borderColor: '#73e5a544',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#73e5a544",
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   subtitle: {
-    color: '#768490',
+    color: "#768490",
     fontSize: 13,
     marginTop: 2,
   },
   // Date Navigator
   dateNavCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#18242a',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#18242a",
     borderRadius: 16,
     padding: 12,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#2a3d47',
+    borderColor: "#2a3d47",
   },
   navBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#73e5a511',
+    backgroundColor: "#73e5a511",
     borderWidth: 1,
-    borderColor: '#73e5a533',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#73e5a533",
+    justifyContent: "center",
+    alignItems: "center",
   },
   navBtnDisabled: {
-    backgroundColor: '#18242a',
-    borderColor: '#2a3d47',
+    backgroundColor: "#18242a",
+    borderColor: "#2a3d47",
   },
   dateCenterBlock: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   dateLabel: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   jumpToday: {
-    color: '#73e5a5',
+    color: "#73e5a5",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   // Snapshot
   snapshotCard: {
-    backgroundColor: '#18242a',
+    backgroundColor: "#18242a",
     borderRadius: 18,
     padding: 18,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#73e5a522',
+    borderColor: "#73e5a522",
   },
   snapshotTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 14,
   },
   snapshotTitle: {
-    color: '#768490',
+    color: "#768490",
     fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontWeight: "600",
+    textTransform: "uppercase",
     letterSpacing: 1,
     flex: 1,
   },
   historyBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
-    backgroundColor: '#ff9f4322',
+    backgroundColor: "#ff9f4322",
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderWidth: 1,
-    borderColor: '#ff9f4344',
+    borderColor: "#ff9f4344",
   },
   historyBadgeText: {
-    color: '#ff9f43',
+    color: "#ff9f43",
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   snapshotRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   snapshotItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   snapshotVal: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: 4,
   },
   snapshotUnit: {
-    color: '#768490',
+    color: "#768490",
     fontSize: 12,
   },
   snapshotDivider: {
     width: 1,
     height: 60,
-    backgroundColor: '#2a3d47',
+    backgroundColor: "#2a3d47",
   },
   mmkvNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#2a3d47',
+    borderTopColor: "#2a3d47",
   },
   mmkvNoteText: {
-    color: '#73e5a5',
+    color: "#73e5a5",
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   // Action buttons
   resetAllBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
-    backgroundColor: '#ff6b6b11',
+    backgroundColor: "#ff6b6b11",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#ff6b6b33',
+    borderColor: "#ff6b6b33",
     paddingVertical: 14,
     marginTop: 4,
     marginBottom: 16,
   },
   resetAllText: {
-    color: '#ff6b6b',
-    fontWeight: '700',
+    color: "#ff6b6b",
+    fontWeight: "700",
     fontSize: 15,
   },
   hint: {
-    color: '#4a6070',
+    color: "#4a6070",
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 18,
     marginBottom: 20,
   },
   // History
   historyToggleBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
-    backgroundColor: '#73e5a511',
+    backgroundColor: "#73e5a511",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#73e5a533',
+    borderColor: "#73e5a533",
     paddingVertical: 13,
     marginBottom: 16,
   },
   historyToggleText: {
-    color: '#73e5a5',
-    fontWeight: '700',
+    color: "#73e5a5",
+    fontWeight: "700",
     fontSize: 14,
   },
   historyCard: {
-    backgroundColor: '#18242a',
+    backgroundColor: "#18242a",
     borderRadius: 18,
     padding: 16,
     marginBottom: 16,
   },
   historyTitle: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: "800",
     marginBottom: 12,
   },
   emptyText: {
-    color: '#4a6070',
+    color: "#4a6070",
     fontSize: 13,
-    textAlign: 'center',
+    textAlign: "center",
     paddingVertical: 16,
   },
   historyHint: {
-    color: '#4a6070',
+    color: "#4a6070",
     fontSize: 11,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 10,
   },
 });
